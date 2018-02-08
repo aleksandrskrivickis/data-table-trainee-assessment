@@ -1,19 +1,115 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<meta charset="utf-8" />
-<meta http-equiv="content-language" content="en" />
-<meta http-equiv="Content-Type" content="UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-<link href="main.css" media="all" rel="stylesheet" type="text/css" />
-</head>
-<body>
-<script src="jquery-2.1.1.js"></script>
-<script>
-$.getJSON('data.json', function (data) {
-    console.log(data);
-});
-</script>
-</body>
+    <head>
+        <title>BBC Test</title>
+        <meta charset="utf-8" />
+        <meta http-equiv="content-language" content="en" />
+        <meta http-equiv="Content-Type" content="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <link href="main.css" media="all" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    </head>
+    <body>
+        <table style="width:auto" class="table table-sm table-dark" id="outputTable">
+            <thead class="thead-dark">
+                <tr>
+                    <th><a href="" onclick="sortButton('bbcfour')">Date</a></th>
+                    <th><a href="#" onclick="sortButton('bbcfour')">Bbcfour</a></th>
+                    <th><a href="#" onclick="sortButton('bbcnews24')">BBC News 24</a></th>
+                    <th><a href="#" onclick="sortButton('bbcone')">BBC One</a></th>
+                    <th><a href="#" onclick="sortButton('bbcthree')">BBC Three</a></th>
+                    <th><a href="#" onclick="sortButton('bbctwo')">BBC Two</a></th>
+                    <th><a href="#" onclick="sortButton('cbbc')">CBBC</a></th>
+                    <th><a href="#" onclick="sortButton('cbeebies')">Cbeebies</a></th>
+                </tr>
+            </thead>
+        </table>
+
+        <script src="jquery-2.1.1.js"></script>
+
+        <script>
+                        window.onload = init;
+
+                        var sortOrder = 'des';
+                        var outputGraph = {};
+
+                        function init() {
+                            'use strict';
+
+                            $.getJSON('data.json', function (table) {
+                                //data2 = sortEntries(Object.entries(data), 'bbcfour', 'asc');
+                                var data2 = sortEntries(Object.entries(table));
+                                storeTableHeaders();
+                                renderTable(data2);
+                            });
+                        }
+
+                        function storeTableHeaders() {
+                            tableHeaders = outputTable.innerHTML.toString();
+                        }
+
+                        function getTableHeaders() {
+                            return tableHeaders;
+                        }
+
+                        function renderTable(x) {
+                            outputTable.innerHTML = getTableHeaders();
+                            for (var i = 0; i < Object.getOwnPropertyNames(x).length; i++) {
+                                outputTable.innerHTML +=
+                                        "<table>" +
+                                        "<tbody>" +
+                                        "<tr>" +
+                                        "<td>" + renderDate(x[i][0]) + "</td>" +
+                                        "<td>" + x[i][1].bbcfour + "</td>" +
+                                        "<td>" + x[i][1].bbcnews24 + "</td>" +
+                                        "<td>" + x[i][1].bbcone + "</td>" +
+                                        "<td>" + x[i][1].bbcthree + "</td>" +
+                                        "<td>" + x[i][1].bbctwo + "</td>" +
+                                        "<td>" + x[i][1].cbbc + "</td>" +
+                                        "<td>" + x[i][1].cbeebies + "</td>" +
+                                        "</tr>" +
+                                        "</tbody>" +
+                                        "</table>";
+                            }
+                        }
+
+                        function sortEntries(input, key, way) {
+                            if (key === way) {
+                                return input;
+                            }
+                            return input.sort(function (a, b) {
+                                var x = a[1][key];
+                                var y = b[1][key];
+                                if (way === 'asc') {
+                                    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                                }
+                                if (way === 'des') {
+                                    return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+                                }
+                            });
+                        }
+
+                        function sortButton(column) {
+                            if (sortOrder === 'des') {
+                                sortOrder = 'asc';
+                            } else {
+                                sortOrder = 'des';
+                            }
+                            $.getJSON('data.json', function (data) {
+                                data2 = sortEntries(Object.entries(data), column, sortOrder);
+                                renderTable(data2);
+                            });
+
+                        }
+
+                        function renderDate(input) {
+                            var m_names = new Array("January", "February", "March",
+                                    "April", "May", "June", "July", "August", "September",
+                                    "October", "November", "December");
+                            var d = new Date(input);
+                            return m_names[d.getMonth()] + " " + d.getFullYear();
+                        }
+        </script>
+    </body>
 </html>
